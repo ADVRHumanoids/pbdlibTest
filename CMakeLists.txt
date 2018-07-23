@@ -41,6 +41,7 @@ include(MacroYCMInstallLibrary)
 
 # find required packages
 find_package(XCM REQUIRED)
+find_package(pbd REQUIRED)
 
 # XENOMAI
 set(ENABLE_XENO CACHE BOOL "ON")
@@ -51,6 +52,7 @@ endif()
 # include
 include_directories(include/${PROJECT_NAME}
                     ${XCM_INCLUDE_DIRS}
+                    ${pbd_INCLUDE_DIRS}
                     )
 
 # lib
@@ -64,7 +66,10 @@ if ( Xenomai_FOUND )
 endif()
 
 # linking
-target_link_libraries(${PROJECT_NAME} ${XCM_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${XCM_LIBRARIES} ${pbd_LIBRARIES})
+
+# Copy data/ to build so that the examples can load from that location
+FILE(COPY ${PROJECT_SOURCE_DIR}/data DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/)
 
 #install
 ycm_library_install(${PROJECT_NAME} 1 0 0)

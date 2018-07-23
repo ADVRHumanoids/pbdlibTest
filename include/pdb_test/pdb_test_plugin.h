@@ -21,6 +21,12 @@
 #define pdb_test_PLUGIN_H_
 
 #include <XCM/XBotControlPlugin.h>
+#include <pbdlib/gmm.h>
+#include <pbdlib/gmr.h>
+#include <armadillo>
+//#include "/home/fabudakka/work/advr-superbuild/build/install/include/pbdlib/gmm.h"
+//#include "/home/fabudakka/work/advr-superbuild/build/install/include/pbdlib/gmr.h"
+
 
 
 namespace XBotPlugin {
@@ -43,6 +49,9 @@ public:
     virtual void on_stop(double time);
     
     virtual ~pdb_test();
+    
+    virtual void minimum_jerk_spline(double x0, double dx0, double ddx0, double x1, double dx1, double ddx1, double T, double a[6]);
+    virtual void minimum_jerk(double t, double a[6], double &pos, double &vel, double &acc);
 
 protected:
 
@@ -51,12 +60,29 @@ protected:
 private:
 
     XBot::RobotInterface::Ptr _robot;
+    XBot::ModelInterface::Ptr _model;
+    
+    Eigen::VectorXd _dqTmp, _u;
+    XBot::JointNameMap _q_right,_q_curr, _q_home;
 
-    double _start_time;
+    double _start_time, _dt = 0.001, _T = 2.0;
 
     Eigen::VectorXd _q0;
+    Eigen::MatrixXd _q, _dq, _ddq;
+    int _N;
+    
+    std::string _current_command;
 
     XBot::MatLogger::Ptr _logger;
+    
+    pbdlib::GMM_Model* _gmm, * _gmmOut;
+    pbdlib::GMR _gmr;
+    arma::urowvec _in,_out;
+    arma::mat _GMRin;		// pbdlib expects a mat type as input to GMR
+    arma::colvec _Qd;
+
+    
+    //pbdlib::GMM_Model* gmmOut;
 
 };
 
